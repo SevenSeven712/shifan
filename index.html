@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的文本站</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #fafafa; color: #222; }
+        h1 { border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        .article-item { background: white; padding: 15px 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer; transition: 0.2s; }
+        .article-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .article-item h2 { margin: 0 0 6px; color: #0366d6; }
+        .article-item .meta { font-size: 14px; color: #888; }
+        .article-item .summary { color: #555; margin-top: 8px; }
+        .article-detail { display: none; margin-top: 20px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .article-detail .back { cursor: pointer; color: #0366d6; margin-bottom: 15px; display: inline-block; }
+        .article-detail .content { line-height: 1.8; }
+        #loading { text-align: center; color: #888; }
+    </style>
+</head>
+<body>
+    <h1>📚 我的文本库</h1>
+    <div id="articleList"></div>
+    <div id="articleDetail" class="article-detail"></div>
+
+    <script src="articles.js"></script>
+    <script>
+        let articles = [];
+
+        function renderList() {
+            const container = document.getElementById('articleList');
+            const detail = document.getElementById('articleDetail');
+            detail.style.display = 'none';
+
+            if (typeof articleData === 'undefined' || !Array.isArray(articleData) || articleData.length === 0) {
+                container.innerHTML = '<p>暂无文章，请通过后台添加。</p>';
+                return;
+            }
+            articles = articleData;
+            let html = '';
+            articles.forEach((item, index) => {
+                const summary = item.summary || item.content?.substring(0, 100) + '...' || '';
+                html += `
+                    <div class="article-item" onclick="showDetail(${index})">
+                        <h2>${item.title || '无标题'}</h2>
+                        <div class="meta">${item.date || ''}  ${item.author ? '· ' + item.author : ''}</div>
+                        <div class="summary">${summary}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function showDetail(index) {
+            const item = articles[index];
+            if (!item) return;
+            const detail = document.getElementById('articleDetail');
+            detail.style.display = 'block';
+            detail.innerHTML = `
+                <div class="back" onclick="renderList()">← 返回列表</div>
+                <h2>${item.title}</h2>
+                <div class="meta">${item.date || ''}  ${item.author ? '· ' + item.author : ''}</div>
+                <div class="content">${item.content || '（正文为空）'}</div>
+            `;
+            document.getElementById('articleList').innerHTML = ''; // 隐藏列表
+        }
+
+        window.onload = renderList;
+    </script>
+</body>
+</html>
